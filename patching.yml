@@ -1,1 +1,26 @@
+---   
+- hosts: repo
+  tasks:
+   - name: Execute the script
+     command: sh /root/testing.sh
+     
+- hosts: nodes
+  tasks:
+   - name: update the Rhel-8 all packages
+     yum:
+      name: '*'
+      state: latest
+      update_cache: yes
+      update_only: yes
+     when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '8'
+     register: yum_update
+        
+   - name: update the Rhel-7 all packages
+     yum:
+      name: '*'
+      state: latest
+     when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '7'
+        
+   - name: Apply Security Patches
+     shell: yum update --security
 
