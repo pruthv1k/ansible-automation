@@ -1,0 +1,35 @@
+---
+- name: The hardening playbook
+  hosts: hardening_server
+  tasks:
+   - name: Show the target output
+     command: systemctl mask ctrl-alt-del.target
+
+   - name: Show the system services
+     register: ssout
+     command: ss -tulpn
+
+   - debug: 
+       var: ssout.stdout_lines
+
+   - name: Show the list all installed services
+     register: systemctlout
+     command: systemctl list-units -t service 
+
+   - debug:
+       var: systemctlout.stdout_lines
+
+   - name: Remove the postfix service
+     yum:
+      name: postfix
+      state: absent
+
+   - name: No password
+     shell: echo $(awk -F':' '($2 == "") {print}' /etc/shadow)
+
+   - name: All accounts empty password
+     register: passwdout
+     command: passwd -l username
+     
+   - debug:
+       var: passwdout.stdout_lines
