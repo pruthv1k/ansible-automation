@@ -1,0 +1,63 @@
+---
+# This playbook backups all mysql databases into separate files.
+- name: backup mysql
+  hosts: backup  # "{{ mysql_server }}"
+  vars:
+     - app_host: 192.168.1.21
+     - backup_host: 192.168.1.18
+     - exclude_db:
+       - "Database"
+       - "information_schema"
+       - "performance_schema"
+       - "mysql"
+  tasks:
+   - name: set date and time for backup
+     set_fact:
+        date: "{{ lookup('pipe' , 'date +%m-%d-%Y') }}"
+
+   - debug:
+       msg: "{{ date }}"
+
+   - name: Create backup destination for the database backups
+     file:
+       path: /opt/backup/backup-{{ date }}
+       owner: root
+       group: root
+       mode: '0774'
+       state: directory
+     when: "{{ inventory_hostname  == app_host }}"
+
+   - name: get db names
+     shell: 'mysql -u root -pRedhat@12345 -e "show databases;" '
+     register: dblist
+     when: "{{ inventory_hostname == app_host }}"
+
+   - name: backup databases
+     mysql_db:
+       state: dump
+       name: "{{ item }}"
+       target: "/opt/backup/{{ item }}.sql.tgz"
+       login_user: root
+       login_password: Redhat@12345 #"{{ vault_root_passwd }}"
+     with_items: "{{ dblist.stdout_lines | difference(exclude_db) }}"
+     when: "{{ inventory_hostname == app_host }}"
+   
+   - set_fact:
+        dblist: "{{ dblist.stdout_lines | difference(exclude_db) }}"
+     when: "{{ inventory_hostname == app_host }}"
+
+#   - name: synchronizeation of src to dest
+#     synchronize: 
+#       src: /opt/backup/
+#       dest: /root/aman/
+#     when: "{{ inventory_hostname == app_host }}"
+
+   - name: copy to database
+     fetch:
+       src: "/opt/backup/{{ item }}.sql.tgz"
+       dest: /root/aman/
+       flat: yes
+#       backup: yes
+#       remote_src: yes
+     with_items: "{{ dblist }}"
+     when: "{{ inventory_hostname == backup_host }}"
