@@ -2,7 +2,7 @@
 - hosts: repo
   tasks:
    - name: Execute the script
-     command: sh /root/testing.sh
+     shell: cd /home/ksdcrepo ; sh update.sh
      
 - hosts: nodes
   tasks:
