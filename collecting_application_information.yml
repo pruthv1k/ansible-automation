@@ -1,0 +1,24 @@
+---
+- name: Collecting Linux application information through Ansible
+  hosts: web_server
+  tasks:
+   - name: Show the java version
+     register: javaout
+     command: java -version
+
+   - debug:
+       var: javaout.stdout_lines
+
+   - name: Show the 8080 port number
+     register: netstatout
+     command: netstat -ntlp | grep 8080
+
+   - debug:
+       var: netstatout.stdout_lines
+
+   - name: Show the 443,80 port number
+     register: netstatout
+     command: netstat -ntlp | grep 443,80
+
+   - debug:
+       var: netstatout.stdout_lines
