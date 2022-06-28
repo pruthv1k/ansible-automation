@@ -1,4 +1,3 @@
-# Created by Thomas Preischl 06/2020
 ---
 - name: Create VM from template
   vmware_guest:
