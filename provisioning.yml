@@ -1,43 +1,37 @@
 ---
-- name: Create VM from template
-  vmware_guest:
-      validate_certs: False
-      hostname: "{{ vcenter_hostname }}"
+- hosts: localhost
+  gather_facts: no
+  vars:
+    vcenter_server: "10.19.xx.xx"
+    vcenter_user: "administrator@vsphere.local"
+    vcenter_pass: "xxxxxx"
+    datacenter_name: "vcenter-datacenter"
+    cluster_name: "10.xx.xx.xx"
+  tasks:
+  - name: Provisioning VM From Template
+    community.vmware.vmware_guest:
+      hostname: "{{ vcenter_server }}"
       username: "{{ vcenter_user }}"
       password: "{{ vcenter_pass }}"
-      cluster: "{{ vcenter_cluster }}"
-      datacenter: "{{ vcenter_datacenter }}"
-      name: '{{ guest_hostname }}'
-      folder: "{{ vm_foldername }}"
-      template: "{{ vmtemplate }}"
-      datastore: "{{ datastore }}"
-      # disk:
-      #   - size_gb: "{{ disk_size | default(50) }}"
-      #     type: thin
-      #     datastore: "{{ datastore }}"
+      validate_certs: False
+      name: test_vm
+      template: vm-test-template
+      datacenter: "{{ datacenter_name }}"
+      folder: /{{ datacenter_name }}/vm
+      cluster: "{{ cluster_name }}"
+      datastore: "datastore01"
       networks:
-      - name: "{{ vm_network }}"
-        ip: '{{ inventory_hostname }}'
-        netmask: '{{ guest_netmask }}'
-        gateway: '{{ guest_gateway }}'
-        dns_servers:
-        - '{{ guest_dns_server1 }}'
-      # - '{{ guest_dns_server2 }}'
-      hardware:
-        num_cpus: '{{ guest_vcpu }}'
-        memory_mb: '{{ guest_vram }}'
+      - name: VM Network
+        ip: 10.xx.xx.xx
+        netmask: 255.xx.xx.0
+        gateway: 10.xx.xx.xx
+        type: static
+        dns_servers: 8.x.x.x
       customization:
-        hostname: '{{ guest_hostname }}'
-        password: '{{ ansible_password }}'
-        joinworkgroup: 'workgroup'
-        timezone: 110
-      wait_for_customization: True
+        hostname: "test_vm"
+        dns_servers:
+        - 8.x.x.x
+        - 8.x.x.x
       state: poweredon
-  delegate_to: localhost
-  register: newvm
-- name: Wait until connection to vm
-  wait_for_connection:
-    delay: 5
-    timeout: 900
-- name: Gather facts for the first time
-  setup:
+      wait_for_ip_address: no
+    delegate_to: localhost
