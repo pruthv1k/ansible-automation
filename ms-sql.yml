@@ -1,0 +1,16 @@
+#Install ms-sql 2019 on a windows server
+# Defaultconfig.ini ==> /UpdateEnabled=False
+
+---
+- hosts: win
+  gather_facts: false
+  tasks:
+    - name: copy the file
+      win_copy:
+        src: /root/win/test.ps1
+        dest: C:\Users\Administrator\Downloads\
+
+    - name: Run the script
+      win_command: powershell.exe -executionpolicy bypass -noninteractive -nologo -file "C:\Users\Administrator\Downloads\test.ps1"
+      become: yes
+      become_user: Administrator
