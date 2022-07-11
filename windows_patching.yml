@@ -1,0 +1,24 @@
+---
+- name: This is a windows patching playbook
+  hosts: win_server
+  gather_facts: false
+  tasks:
+   - name: Create the Directory for windows server
+     win_file:
+       path: E:\patch
+       state: directory
+
+   - name: Copy the windows patching software
+     win_copy:
+       src: /var/lib/awx/projects/UC_5_windows_patching/windwos10.0-kb5013941-x64_8df2c8940d6cd19f5086728dbc3c991decefad7.msu
+       dest: E:\patch\
+
+   - name: Copy the patching script
+     win_copy:
+       src: /var/lib/awx/projects/UC_5_windows_patching/patch.ps1
+       dest: E:\patch\
+
+   - name: Run the windows patching script for powershell
+     win_command: powershell.exe -executionpolicy bypass - noninteractive -nologin -file "E:\patch\patch.ps1"
+     become_user: Administrtor
+     become_method: runas
