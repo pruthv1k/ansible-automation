@@ -1,0 +1,16 @@
+# Ansible script 
+#
+#
+---
+- name: The hardening playbook
+  hosts: localhost
+  tasks:
+   - name: Show the target output
+     command: systemctl daemon-reload
+
+  tasks:
+   - name: ping test
+     command: touch ~/file.txt
+
+  tasks:
+   - n
