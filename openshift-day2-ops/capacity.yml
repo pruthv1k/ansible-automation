@@ -1,16 +1,26 @@
-# Ansible script 
-#
-#
+#Ansible script to fetch openshift cluster recource utilization
 ---
-- name: The hardening playbook
-  hosts: localhost
-  tasks:
-   - name: Show the target output
-     command: systemctl daemon-reload
-
-  tasks:
-   - name: ping test
-     command: touch ~/file.txt
-
-  tasks:
-   - n
+- hosts: localhost
+  vars_files: vars.yml
+  tasks: 
+    - name: Connect to the Openshift cluster
+      command: oc login -u {{ username }} -p {{ password }} https://api.{{ env_name}}.com:6443
+      register: connection
+    - name: Cluster connection status...
+      debug:
+      var: connection.stdout lines
+    
+    - name: Displaying the node health status of {{ env_name}} openshift cluster
+      command: oc get nodes
+      register: node_status
+    - name:
+      debug:
+      var: node_status.stdout_lines
+  
+    - name: Displaying the resource details of {{ env_name}} openshift cluster
+      command: oc adm top nodes
+      register: node_resource_output
+    - name:
+      debug:
+      var: node_resource_output.stdout_lines      
+...
