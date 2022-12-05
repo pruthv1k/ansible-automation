@@ -17,13 +17,6 @@
     - name:
       debug:
         var: node_status.stdout_lines
-  
-#    - name: Displaying the resource details of {{ env_name}} openshift cluster
-#      command: oc adm top nodes
-#      register: node_resource_output
-#    - name:
-#      debug:
-#        var: node_resource_output.stdout_lines
 
     - name: Displaying the project details of {{ env_name}} openshift cluster
       command: oc adm top pods --all-namespaces
