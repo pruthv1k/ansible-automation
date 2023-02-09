@@ -163,11 +163,11 @@
       debug:
         var: task18.stdout_lines
 
-    - name: For NPP clusters, spare node has been cordoned 
+    - name: For OCP clusters, spare node has been cordoned 
       shell: for i in `oc get nodes --no-headers | awk '{print $1}'`; do echo $i; oc describe node $i | grep -i taint; done
       register: task19
 
-    - name: Display Status --> For NPP clusters, spare node has been cordoned
+    - name: Display Status --> For OCP clusters, spare node has been cordoned
       debug:
         var: task19.stdout_lines
 
