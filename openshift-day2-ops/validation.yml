@@ -1,0 +1,196 @@
+#Ansible script to fetch openshift cluster recource utilization
+---
+- hosts: localhost
+  tasks: 
+    - name: Connect to the Openshift cluster
+      command: oc login -u admin -p PSOgZLXTyJX1lUbq https://api.cluster-sf2wx.sf2wx.sandbox905.opentlc.com:6443
+      register: connection
+    
+    - name: Cluster connection status...
+      debug:
+        var: connection.stdout_lines
+
+    - name: Chrony Machine Config Setup
+      command: oc get mc 
+      register: task1
+
+    - name: Diaplay Status --> Chrony Machine Config Setup
+      debug:
+        var: task1.stdout_lines
+
+    - name: Machine Config Pool Setup
+      command: oc get mcp
+      register: task2
+
+    - name: Diaplay Status --> Machine Config Pool Setup
+      debug:
+        var: task2.stdout_lines
+
+    - name: Nodes are labelled based on their role
+      command: oc get nodes
+      register: task3
+
+    - name: Display Status --> Nodes are labelled based on their role
+      debug:
+        var: task3.stdout_lines
+
+    - name: Nodes should have appropriate taints
+      shell: for i in `oc get nodes --no-headers | awk '{print $1}'`; do echo $i; oc describe node $i | grep -i taint; done
+      register: task4
+
+    - name: Display Status --> Taint Status
+      debug:
+        var: task4.stdout_lines
+ 
+    - name: Router pods to be running on dedicated infrastructure nodes ?
+      shell: oc get pods -n openshift-ingress -o wide
+      register: task5
+
+    - name: Display Status --> Router pods to be running on dedicated infrastructure nodes
+      debug:
+        var: task5.stdout_lines
+
+    #- name: Operator Catalog Source to be updated to refer to offline registry ?
+    #  shell: oc get operatorhub cluster -o yaml | grep -i defaultsources
+    #  register: task6
+
+   # - name: Display Status --> Router pods to be running on dedicated infrastructure nodes
+   #  debug:
+   #     var: task6.stdout_lines
+    
+        # - name: Ensure Local Storage Operator is installed
+        #shell: oc get operator | grep -i local
+        #register: task7
+
+        #- name: Display Status --> Ensure Local Storage Operator is installed
+        #debug:
+        #var: task7.stdout_lines
+  
+        #    - name: Ensure local volumes are created and used
+        #      shell : oc get localvolumes
+        #      register: task8
+
+        #    - name: Display Status --> Ensure local volumes are created and used
+        #      debug: 
+        #        var: task8.stdout_lines
+
+    - name: Logging and Monitoring stack are deployed
+      shell: oc get co
+      register: task9
+
+    - name: Display Status --> Logging and Monitoring stack are deployed
+      debug:
+        var: task9.stdout_lines
+
+    - name: LDAP and HTPasswd Authentication Mechanisms Setup Status
+      shell: oc get oauth cluster -o yaml
+      register: task10
+
+    - name: Display Status --> LDAP and HTPasswd Authentication Mechanisms Setup Status
+      debug:
+        var: task10.stdout_lines
+      
+    - name: LDAP Group Sync Setup Verify
+      shell: oc get cj
+      register: task10
+
+    - name: Display Status --> LDAP Group Sync Setup Verify
+      debug:
+        var: task10.stdout_lines
+
+    - name: Role Binding Self Provisioning status
+      shell: oc get clusterrolebindings.authorization.openshift.io self-provisioners
+      register: task11
+
+    - name: Display Status --> Role Binding Self Provisioning status
+      debug:
+        var: task11
+
+        #    - name: Existence of kubeadmin user status
+        #shell: oc get kubeadmin -n kube-system
+        #when: 
+        #re3gister: task12
+
+        #   - name: Display Status --> Existence of kubeadmin user status
+        #debug:
+        #var: task12.stdout_lines
+
+    - name: OCP Admin user has been created
+      shell: oc get users | grep admin
+      register: task13
+
+    - name: Display Status --> OCP Admin user has been created
+      debug:
+        var: task13.stdout_lines
+
+    - name: Egress IPs have been configured
+      shell: oc get hostsubnets
+      register: task14
+
+    - name: Display Status --> Configuration of Egress IPs
+      debug:
+        var: task14.stdout_lines
+
+    - name: ETCD Backup has been setup
+      shell: oc get cj 
+      register: task15
+
+    - name: Display Status --> ETCD Backup has been setup
+      debug:
+        var: task15.stdout_lines
+
+    - name: Cronjob to auto approve the certificates
+      shell: oc get cj -A
+      register: task16
+
+    - name: Display Status --> Cronjob to auto approve the certificates
+      debug:
+        var: task16.stdout_lines
+
+    - name: Namespecific Network Policies have been applied
+      shell: oc get netpol 
+      register: task17
+
+    - name: Display Status --> Namespecific Network Policies have been applied
+      debug:
+        var: task17.stdout_lines
+
+    - name: Openshift Integrated Registry has been configured
+      shell: oc get pods -n openshift-image-registry | grep image-registry
+      register: task18
+
+    - name: Display Status --> Openshift Integrated Registry has been configured
+      debug:
+        var: task18.stdout_lines
+
+    - name: For NPP clusters, spare node has been cordoned 
+      shell: for i in `oc get nodes --no-headers | awk '{print $1}'`; do echo $i; oc describe node $i | grep -i taint; done
+      register: task19
+
+    - name: Display Status --> For NPP clusters, spare node has been cordoned
+      debug:
+        var: task19.stdout_lines
+
+    - name: Ensure Session Timeout has been configured
+      shell: oc get oauthclient openshift-browser-client -o yaml | grep -i token
+      register: task20
+
+    - name: Display Status --> Ensure Session Timeout has been configured
+      debug:
+        var: task20.stdout_lines
+
+    - name: Ensure we are using custom-signed CA Cert for APP URLs
+      shell: oc get oauthclient openshift-challenging-client -o yaml | grep -i token
+      register: task21
+
+    - name: Display Status --> Ensure we are using custom-signed CA Cert for APP URLs
+      debug:
+        var: task21.stdout_lines 
+
+    - name: LDAP filtering to disable console view
+      shell: oc get oauth cluster  -o yaml
+      register: task24
+
+    - name: Display Status --> LDAP filtering to disable console view
+      debug:
+        var: task24.stdout_lines
