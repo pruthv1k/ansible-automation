@@ -1,0 +1,9 @@
+- name: Update Windows
+  hosts: windows
+  gather_facts: no
+
+  tasks:
+    - name: Install Windows updates
+      win_updates:
+        category_names: SecurityUpdates,CriticalUpdates,DefinitionUpdates
+        reboot: yes
