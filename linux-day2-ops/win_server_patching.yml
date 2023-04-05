@@ -5,4 +5,4 @@
   tasks:
     - name: Install Windows updates
       win_updates:
-        category_names: SecurityUpdates,CriticalUpdates,DefinitionUpdates
+        category_names: SecurityUpdates
