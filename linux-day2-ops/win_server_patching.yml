@@ -1,5 +1,5 @@
 - name: Update Windows
-  hosts: windows
+  hosts: windows_instances
   gather_facts: no
 
   tasks:
