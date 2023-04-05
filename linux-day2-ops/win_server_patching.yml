@@ -5,4 +5,3 @@
   tasks:
     - name: Install Windows updates
       win_ping: 
-        
