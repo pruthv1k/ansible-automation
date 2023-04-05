@@ -4,4 +4,5 @@
 
   tasks:
     - name: Install Windows updates
-      win_ping: 
+      win_updates:
+        category_names: SecurityUpdates,CriticalUpdates,DefinitionUpdates
